@@ -696,11 +696,11 @@
             :options   {:topBar {:visible false}}
             :component wallet.buy-crypto/website}
 
-           {:name   :nft-details
-            :insets {:bottom true}
-            ;;TODO dynamic title
-            :options   {:topBar {:visible false}}
-            :component wallet.account/nft-details}
+           ;; {:name   :nft-details
+           ;;  :insets {:bottom true}
+           ;;  ;;TODO dynamic title
+           ;;  :options   {:topBar {:visible false}}
+           ;;  :component wallet.account/nft-details}
 
            ;My Status
            {:name      :my-status

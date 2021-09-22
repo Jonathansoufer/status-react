@@ -246,10 +246,11 @@
 
 (fx/defn show-nft-details
   {:events [::show-nft-details]}
-  [cofx asset]
+  [cofx comp asset]
   (fx/merge cofx
-            {:db (assoc (:db cofx) :wallet/current-collectible-asset asset)}
-            (navigation/navigate-to :nft-details {})))
+            (bottom-sheet/show-bottom-sheet
+             {:view {:content (fn []
+                                [comp asset])}})))
 
 (defn rpc->token [tokens]
   (reduce (fn [acc {:keys [address] :as token}]
