@@ -220,12 +220,13 @@
   {:events [::fetch-collectibles-collection]}
   [{:keys [db]}]
   (let [addresses (map (comp string/lower-case :address)
-                       (get db :multiaccount/accounts))]
+                       (get db :multiaccount/accounts))
+        chain-id  1]
     (when (get-in db [:multiaccount :opensea-enabled?])
       {::json-rpc/call (map (fn [address]
-                              {:method "wallet_getOpenseaCollectionsByOwner"
-                               :params [address]
-                               :on-error (fn [error]
+                              {:method     "wallet_getOpenseaCollectionsByOwner"
+                               :params     [chain-id address]
+                               :on-error   (fn [error]
                                            (log/error "Unable to get Opensea collections" address error))
                                :on-success #(re-frame/dispatch [::collectibles-collection-fetch-success address %])})
                             addresses)})))
@@ -238,11 +239,12 @@
 (fx/defn fetch-collectible-assets-by-owner-and-collection
   {:events [::fetch-collectible-assets-by-owner-and-collection]}
   [_ address collectible-slug limit]
-  {::json-rpc/call [{:method     "wallet_getOpenseaAssetsByOwnerAndCollection"
-                     :params     [address collectible-slug limit]
-                     :on-error   (fn [error]
-                                   (log/error "Unable to get collectible assets" address error))
-                     :on-success #(re-frame/dispatch [::collectible-assets-fetch-success address collectible-slug %])}]})
+  (let [chain-id 1]
+    {::json-rpc/call [{:method     "wallet_getOpenseaAssetsByOwnerAndCollection"
+                       :params     [chain-id address collectible-slug limit]
+                       :on-error   (fn [error]
+                                     (log/error "Unable to get collectible assets" address error))
+                       :on-success #(re-frame/dispatch [::collectible-assets-fetch-success address collectible-slug %])}]}))
 
 (fx/defn show-nft-details
   {:events [::show-nft-details]}

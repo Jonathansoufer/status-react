@@ -20,6 +20,7 @@
             [status-im.wallet.core :as wallet]
             [status-im.ui.components.tabs :as tabs]
             [status-im.multiaccounts.update.core :as multiaccounts.update]
+            [status-im.multiaccounts.core :as multiaccounts]
             [status-im.ui.screens.wallet.components.views :as wallet.components]
             [status-im.utils.handlers :refer [<sub]])
   (:require-macros [status-im.utils.views :as views]))
@@ -189,7 +190,7 @@
                    :icon     :main-icons/share}]
    [quo/list-item {:title    (i18n/label :t/set-as-profile-picture)
                    :theme    :accent
-                   :on-press #()
+                   :on-press #(re-frame/dispatch [::multiaccounts/save-profile-picture-from-url (:image_url nft)])
                    :icon     :main-icons/profile}]
       ])
 
