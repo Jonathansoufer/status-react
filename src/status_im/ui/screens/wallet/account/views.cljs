@@ -21,6 +21,7 @@
             [status-im.ui.components.tabs :as tabs]
             [status-im.multiaccounts.update.core :as multiaccounts.update]
             [status-im.multiaccounts.core :as multiaccounts]
+            [status-im.ui.components.toastable-highlight :refer [toastable-highlight-view]]
             [status-im.ui.screens.wallet.components.views :as wallet.components]
             [status-im.utils.handlers :refer [<sub]])
   (:require-macros [status-im.utils.views :as views]))
@@ -116,83 +117,86 @@
                            :border-color     colors/gray-lighter
                            :border-radius    16}}]])])
 
-(defn nft-traits [traits]
-  [react/view {:flex           1
-               :margin-bottom  24
-               :flex-direction :row
-               :flex-wrap      :wrap}
+(defn nft-trait-card [trait]
+  [react/view {:style {:border-width  1
+                       :border-radius 12
+                       :margin-right  8
+                       :padding       4
+                       :border-color  colors/gray-lighter}}
+   [quo/text {:size  :small
+              :color :secondary}
+    (:trait_type trait)]
+   [quo/text {}
+    (:value trait)]])
+
+(defn nft-traits-scroller [traits]
+  [react/scroll-view {:horizontal            true
+                      :deceleration-rate     "fast"
+                      :snap-to-alignment     "left"
+                      :shows-horizontal-scroll-indicator
+                      false
+                      :scroll-event-throttle 64
+                      :style                 {:padding-left        16
+                                              :margin-vertical     16
+                                              :padding-bottom      16
+                                              :border-bottom-width 1
+                                              :border-color        colors/gray-lighter}}
    (for [trait traits]
-     ^{:key (:trait_type trait)}
-     [react/view {:style {:border-width       1
-                          :border-radius      12
-                          :padding-horizontal 8
-                          :padding-vertical   4
-                          :margin-right       8
-                          :margin-bottom      8
-                          :border-color       colors/gray-lighter}}
+     ^{:key (:type trait)}
+     [nft-trait-card trait])
+
+   ;; spacer
+   [react/view {:style {:height 40
+                        :width  40}}]])
+
+(defn nft-details-modal []
+  (let [nft (<sub [:wallet/selected-collectible])]
+    [react/scroll-view
+     [topbar/topbar
+      {:navigation    {:icon :main-icons/close}
+       :border-bottom false}]
+     [react/view {:padding-horizontal 16}
+      [quo/text {:size   :large
+                 :weight :bold}
+       (:name nft)]
       [quo/text {:size  :small
-                 :color :secondary}
-       (:trait_type trait)]
-      [quo/text {}
-       (:value trait)]])])
+                 :color :secondary
+                 :style {:margin-top    4
+                         :margin-bottom 12}}
+       (-> nft :collection :name)]
 
-(defn nft-details [nft]
-  [:<>
-   [quo/text {} (:name nft)]
-   [quo/text {:style {:margin-top    24
-                      :margin-bottom 16}}
-    (:description nft)]
-   [nft-traits (:traits nft)]])
+      [react/image {:source {:uri (:image_url nft)}
+                    :style  {:width         "100%"
+                             :margin-bottom 16
+                             :aspect-ratio  1
+                             :border-radius 4
+                             :border-width  1
+                             :border-color  colors/gray-lighter}}]
+      [quo/text (:description nft)]]
 
-(defn nft-bottom-sheet [nft]
-  [:<>
-   ;; [topbar/topbar
-   ;;  {:title         (:name nft)
-   ;;   :subtitle      (-> nft :collection :name)
-   ;;   :border-bottom false
-   ;;   :right-accessories
-   ;;   [{:icon     :main-icons/browser
-   ;;     :on-press #(re-frame/dispatch [:browser.ui/open-url (:permalink nft)])}]}]
-   [react/view {:padding-horizontal 16}
-    [react/image {:source {:uri (:image_url nft)}
-                  :style  {:width         "100%"
-                           :margin-bottom 8
-                           :aspect-ratio  1
-                           :border-radius 4
-                           :border-width  1
-                           :border-color  colors/gray-lighter}}]]
-   [quo/list-item {:title    (:name nft)
-                   :subtitle (i18n/label :t/view-details)
-                   :chevron  true
-                   :on-press #(re-frame/dispatch [:bottom-sheet/show-sheet
-                                                  {:content (fn []
-                                                              [nft-details nft])}])
-                   :icon     [react/image {:source      {:uri (:image_url nft)}
-                                           :resize-mode :cover
-                                           :style       {:border-radius 40
-                                                         :height        40
-                                                         :aspect-ratio  1
-                                                         :overflow      :hidden
-                                                         :border-width  1
-                                                         :border-color  colors/gray-lighter}}]}]
+     [nft-traits-scroller (:traits nft)]
 
-   [quo/list-item {:title    (i18n/label :t/wallet-send)
-                   :icon     :main-icons/send
-                   :theme    :accent
-                   :on-press #()}]
-   [quo/list-item {:title    (i18n/label :t/check-on-opensea)
-                   :theme    :accent
-                   :icon     :main-icons/browser
-                   :on-press #(re-frame/dispatch [:browser.ui/open-url (:permalink nft)])}]
-   [quo/list-item {:title    (i18n/label :t/share)
-                   :theme    :accent
-                   :on-press #()
-                   :icon     :main-icons/share}]
-   [quo/list-item {:title    (i18n/label :t/set-as-profile-picture)
-                   :theme    :accent
-                   :on-press #(re-frame/dispatch [::multiaccounts/save-profile-picture-from-url (:image_url nft)])
-                   :icon     :main-icons/profile}]
-      ])
+     ;; TODO <shivekkhurana>: Enable next
+     ;; [quo/list-item {:title    (i18n/label :t/wallet-send)
+     ;;                 :icon     :main-icons/send
+     ;;                 :theme    :accent
+     ;;                 :on-press #()}]
+
+     ;; TODO <shivekkhurana>: What to do with share?
+     ;; [quo/list-item {:title    (i18n/label :t/share)
+     ;;                 :theme    :accent
+     ;;                 :on-press #()
+     ;;                 :icon     :main-icons/share}]
+     [quo/list-item {:title    (i18n/label :t/view-on-opensea)
+                     :theme    :accent
+                     :icon     :main-icons/browser
+                     :on-press #(re-frame/dispatch [:browser.ui/open-url (:permalink nft)])}]
+     [toastable-highlight-view
+      {:toast-label (i18n/label :success)}
+      [quo/list-item {:title    (i18n/label :t/use-as-profile-picture)
+                      :theme    :accent
+                      :on-press #(re-frame/dispatch [::multiaccounts/save-profile-picture-from-url (:image_url nft)])
+                      :icon     :main-icons/profile}]]]))
 
 (defn nft-assets [{:keys [num-assets address collectible-slug]}]
   (let [assets (<sub [:wallet/collectible-assets-by-collection-and-address address collectible-slug])]
@@ -207,9 +211,7 @@
          [react/touchable-opacity
           {:style    {:width         "48%"
                       :margin-bottom 16}
-           :on-press #(re-frame/dispatch [:bottom-sheet/show-sheet
-                                          {:content (fn []
-                                                      [nft-bottom-sheet asset])}])}
+           :on-press #(re-frame/dispatch [::wallet/show-nft-details asset])}
           [react/image {:style  {:flex          1
                                  :aspect-ratio  1
                                  :border-width  1

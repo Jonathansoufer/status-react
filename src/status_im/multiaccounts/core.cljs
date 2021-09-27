@@ -210,8 +210,7 @@
               (bottom-sheet/hide-bottom-sheet))))
 
 (comment
-  (re-frame/dispatch [::save-profile-picture-from-url "https://lh3.googleusercontent.com/XuKjNm3HydsaxbPkbpGs9YyCKhn5QQk5oDC8XF2jzmPyYXeZofxFtfUDZuQ3EVmacS_BlBKzbX2ypm37YNX3n1fDJA3WndeFcPsp7Z0=w600"])
-  )
+  (re-frame/dispatch [::save-profile-picture-from-url "https://lh3.googleusercontent.com/XuKjNm3HydsaxbPkbpGs9YyCKhn5QQk5oDC8XF2jzmPyYXeZofxFtfUDZuQ3EVmacS_BlBKzbX2ypm37YNX3n1fDJA3WndeFcPsp7Z0=w600"]))
 
 (fx/defn delete-profile-picture
   {:events [::delete-profile-picture]}

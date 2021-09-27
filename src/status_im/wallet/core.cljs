@@ -227,7 +227,7 @@
                               {:method     "wallet_getOpenseaCollectionsByOwner"
                                :params     [chain-id address]
                                :on-error   (fn [error]
-                                           (log/error "Unable to get Opensea collections" address error))
+                                             (log/error "Unable to get Opensea collections" address error))
                                :on-success #(re-frame/dispatch [::collectibles-collection-fetch-success address %])})
                             addresses)})))
 
@@ -248,11 +248,10 @@
 
 (fx/defn show-nft-details
   {:events [::show-nft-details]}
-  [cofx comp asset]
+  [cofx asset]
   (fx/merge cofx
-            (bottom-sheet/show-bottom-sheet
-             {:view {:content (fn []
-                                [comp asset])}})))
+            {:db (assoc (:db cofx) :wallet/selected-collectible asset)}
+            (navigation/open-modal :nft-details {})))
 
 (defn rpc->token [tokens]
   (reduce (fn [acc {:keys [address] :as token}]

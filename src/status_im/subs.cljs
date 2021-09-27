@@ -177,6 +177,7 @@
 (reg-root-key-sub :wallet/all-tokens :wallet/all-tokens)
 (reg-root-key-sub :wallet/collectible-collections :wallet/collectible-collections)
 (reg-root-key-sub :wallet/collectible-assets :wallet/collectible-assets)
+(reg-root-key-sub :wallet/selected-collectible :wallet/selected-collectible)
 
 ;;commands
 (reg-root-key-sub :commands/select-account :commands/select-account)
