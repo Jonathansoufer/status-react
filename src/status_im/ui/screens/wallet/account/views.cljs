@@ -118,11 +118,12 @@
                            :border-radius    16}}]])])
 
 (defn nft-trait-card [trait]
-  [react/view {:style {:border-width  1
-                       :border-radius 12
-                       :margin-right  8
-                       :padding       4
-                       :border-color  colors/gray-lighter}}
+  [react/view {:style {:border-width       1
+                       :border-radius      12
+                       :margin-right       8
+                       :padding-vertical   4
+                       :padding-horizontal 8
+                       :border-color       colors/gray-lighter}}
    [quo/text {:size  :small
               :color :secondary}
     (:trait_type trait)]
