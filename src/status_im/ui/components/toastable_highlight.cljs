@@ -1,4 +1,5 @@
 (ns status-im.ui.components.toastable-highlight
+  "A wrapped touchable highlight that presents a toast when clicked"
   (:require [reagent.core :as reagent]
             [status-im.ui.components.animation :as animation]
             [quo.design-system.colors :as colors]

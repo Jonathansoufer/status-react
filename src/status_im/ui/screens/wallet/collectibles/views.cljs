@@ -53,7 +53,7 @@
                                               :border-bottom-width 1
                                               :border-color        colors/gray-lighter}}
    (for [trait traits]
-     ^{:key (:type trait)}
+     ^{:key (:trait_type trait)}
      [nft-trait-card trait])
 
    ;; spacer
@@ -108,7 +108,8 @@
                      :icon     :main-icons/browser
                      :on-press #(re-frame/dispatch [:browser.ui/open-url (:permalink nft)])}]
      [toastable-highlight-view
-      {:toast-label (i18n/label :success)}
+      ;; the last string is an emoji. It might not show up in all editors but its there
+      {:toast-label (str (i18n/label :profile-picture-updated)) " " "😎"}
       [quo/list-item {:title    (i18n/label :t/use-as-profile-picture)
                       :theme    :accent
                       :on-press #(re-frame/dispatch

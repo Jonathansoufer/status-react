@@ -239,7 +239,7 @@
 (fx/defn fetch-collectible-assets-by-owner-and-collection
   {:events [::fetch-collectible-assets-by-owner-and-collection]}
   [{:keys [db]} address collectible-slug limit]
-  (let [chain-id (ethereum/network->chain-id (get db :networks/current-network))]
+  (let [chain-id (ethereum/network->chain-id (ethereum/current-network db))]
     {::json-rpc/call [{:method     "wallet_getOpenseaAssetsByOwnerAndCollection"
                        :params     [chain-id address collectible-slug limit]
                        :on-error   (fn [error]
