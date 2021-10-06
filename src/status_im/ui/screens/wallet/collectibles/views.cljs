@@ -56,9 +56,7 @@
                       :scroll-event-throttle 64
                       :style                 {:padding-left        16
                                               :margin-vertical     16
-                                              :padding-bottom      16
-                                              :border-bottom-width 1
-                                              :border-color        colors/gray-lighter}}
+                                              :padding-bottom      8}}
    (for [trait traits]
      ^{:key (:trait_type trait)}
      [nft-trait-card trait])
@@ -95,7 +93,13 @@
                                {:background-color colors/black}))}]
       [quo/text (:description nft)]]
 
-     [nft-traits-scroller (:traits nft)]
+     (when (seq (:traits nft))
+       [nft-traits-scroller (:traits nft)])
+
+     ;; seperator
+     [react/view {:style {:border-bottom-width 1
+                          :padding-top         8
+                          :border-color        colors/gray-lighter}}]
 
      ;; TODO <shivekkhurana>: Enable txns
      ;; [quo/list-item {:title    (i18n/label :t/wallet-send)
