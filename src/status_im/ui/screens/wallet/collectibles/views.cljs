@@ -16,6 +16,11 @@
             [status-im.i18n.i18n :as i18n]
             [status-im.ui.components.accordion :as accordion]))
 
+(defn is-image? [nft]
+ (and (seq (:image_url nft))
+      (not (str/ends-with? (:image_url nft) ".svg"))
+      (not (str/ends-with? (:image_url nft) ".mp4"))))
+
 (defn nft-assets-skeleton [num-assets]
   [:<>
    (for [i (range num-assets)]
@@ -79,12 +84,15 @@
        (-> nft :collection :name)]
 
       [react/image {:source {:uri (:image_url nft)}
-                    :style  {:width         "100%"
-                             :margin-bottom 16
-                             :aspect-ratio  1
-                             :border-radius 4
-                             :border-width  1
-                             :border-color  colors/gray-lighter}}]
+                    :style  (merge
+                             {:width         "100%"
+                              :margin-bottom 16
+                              :aspect-ratio  1
+                              :border-radius 4
+                              :border-width  1
+                              :border-color  colors/gray-lighter}
+                             (when-not (is-image? nft)
+                               {:background-color colors/black}))}]
       [quo/text (:description nft)]]
 
      [nft-traits-scroller (:traits nft)]
@@ -109,9 +117,7 @@
                      :theme    :accent
                      :icon     :main-icons/browser
                      :on-press #(re-frame/dispatch [:browser.ui/open-url (:permalink nft)])}]
-     (when (and (seq (:image_url nft))
-                (not (str/ends-with? (:image_url nft) ".svg"))
-                (not (str/ends-with? (:image_url nft) ".mp4")))
+     (when (is-image? nft)
        [toastable-highlight-view
         ;; the last string is an emoji. It might not show up in all editors but its there
         {:toast-label (str (i18n/label :profile-picture-updated)) " " "😎"}
@@ -129,14 +135,17 @@
                  :flex-wrap       :wrap
                  :justify-content :space-between
                  :flex-direction  :row
-                 :style           {:padding-horizontal  16}}
+                 :style           {:padding-horizontal 16}}
      (if (seq assets)
        (for [asset assets]
          ^{:key (:id asset)}
          [react/touchable-opacity
-          {:style    {:width         "48%"
-                      :margin-bottom 16}
-           :on-press #(re-frame/dispatch [::wallet/show-nft-details asset])
+          {:style               (merge {:width         "48%"
+                                        :border-radius 16
+                                        :margin-bottom 16}
+                                       (when-not (is-image? asset)
+                                         {:background-color colors/black}))
+           :on-press            #(re-frame/dispatch [::wallet/show-nft-details asset])
            :accessibility-label :nft-asset}
           [react/image {:style  {:flex          1
                                  :aspect-ratio  1
@@ -144,6 +153,7 @@
                                  :border-color  colors/gray-lighter
                                  :border-radius 16}
                         :source {:uri (:image_url asset)}}]])
+
        [nft-assets-skeleton num-assets])]))
 
 (defn nft-collections [address]
