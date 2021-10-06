@@ -21,6 +21,16 @@
       (not (str/ends-with? (:image_url nft) ".svg"))
       (not (str/ends-with? (:image_url nft) ".mp4"))))
 
+(defn missing-image-placeholder []
+  [react/view {:style {:width            "100%"
+                       :flex             1
+                       :align-items      :center
+                       :border-radius    16
+                       :background-color colors/gray-lighter
+                       :justify-content  :center
+                       :aspect-ratio     1}}
+   [icons/icon :photo {:color colors/gray}]])
+
 (defn nft-assets-skeleton [num-assets]
   [:<>
    (for [i (range num-assets)]
@@ -77,21 +87,21 @@
        (:name nft)]
       [quo/text {:size  :small
                  :color :secondary
-                 :style {:margin-top    4
-                         :margin-bottom 12}}
+                 :style {:margin-top 4}}
        (-> nft :collection :name)]
 
-      [react/image {:source {:uri (:image_url nft)}
-                    :style  (merge
-                             {:width         "100%"
-                              :margin-bottom 16
-                              :aspect-ratio  1
-                              :border-radius 4
-                              :border-width  1
-                              :border-color  colors/gray-lighter}
-                             (when-not (is-image? nft)
-                               {:background-color colors/black}))}]
-      [quo/text (:description nft)]]
+      (if (is-image? nft)
+        [react/image {:source {:uri (:image_url nft)}
+                      :style  {:width         "100%"
+                               :margin-bottom 16
+                               :aspect-ratio  1
+                               :border-radius 4
+                               :border-width  1
+                               :border-color  colors/gray-lighter}}]
+        [missing-image-placeholder])
+
+      [quo/text {:style {:margin-top 12}}
+       (:description nft)]]
 
      (when (seq (:traits nft))
        [nft-traits-scroller (:traits nft)])
@@ -144,19 +154,19 @@
        (for [asset assets]
          ^{:key (:id asset)}
          [react/touchable-opacity
-          {:style               (merge {:width         "48%"
-                                        :border-radius 16
-                                        :margin-bottom 16}
-                                       (when-not (is-image? asset)
-                                         {:background-color colors/black}))
+          {:style               {:width         "48%"
+                                 :border-radius 16
+                                 :margin-bottom 16}
            :on-press            #(re-frame/dispatch [::wallet/show-nft-details asset])
            :accessibility-label :nft-asset}
-          [react/image {:style  {:flex          1
-                                 :aspect-ratio  1
-                                 :border-width  1
-                                 :border-color  colors/gray-lighter
-                                 :border-radius 16}
-                        :source {:uri (:image_url asset)}}]])
+          (if (is-image? asset)
+            [react/image {:style  {:flex          1
+                                   :aspect-ratio  1
+                                   :border-width  1
+                                   :border-color  colors/gray-lighter
+                                   :border-radius 16}
+                          :source {:uri (:image_url asset)}}]
+            [missing-image-placeholder])])
 
        [nft-assets-skeleton num-assets])]))
 
