@@ -221,7 +221,9 @@
   [{:keys [db]}]
   (let [addresses (map (comp string/lower-case :address)
                        (get db :multiaccount/accounts))
-        chain-id  1]
+        chain-id  (-> db
+                      ethereum/current-network
+                      ethereum/network->chain-id)]
     (when (get-in db [:multiaccount :opensea-enabled?])
       {::json-rpc/call (map (fn [address]
                               {:method     "wallet_getOpenseaCollectionsByOwner"

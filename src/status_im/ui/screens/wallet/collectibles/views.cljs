@@ -1,5 +1,6 @@
 (ns status-im.ui.screens.wallet.collectibles.views
   (:require [re-frame.core :as re-frame]
+            [clojure.string :as str]
             [status-im.ui.components.react :as react]
             [quo.core :as quo]
             [status-im.utils.handlers :refer [<sub]]
@@ -11,6 +12,7 @@
             [status-im.wallet.core :as wallet]
             [status-im.multiaccounts.update.core :as multiaccounts.update]
             [quo.design-system.colors :as colors]
+            [status-im.ui.components.icons.icons :as icons]
             [status-im.i18n.i18n :as i18n]
             [status-im.ui.components.accordion :as accordion]))
 
@@ -107,16 +109,19 @@
                      :theme    :accent
                      :icon     :main-icons/browser
                      :on-press #(re-frame/dispatch [:browser.ui/open-url (:permalink nft)])}]
-     [toastable-highlight-view
-      ;; the last string is an emoji. It might not show up in all editors but its there
-      {:toast-label (str (i18n/label :profile-picture-updated)) " " "😎"}
-      [quo/list-item {:title    (i18n/label :t/use-as-profile-picture)
-                      :theme    :accent
-                      :on-press #(re-frame/dispatch
-                                  [::multiaccounts/save-profile-picture-from-url (:image_url nft)])
-                      :icon     :main-icons/profile
-                      :accessibility-label
-                      :set-nft-as-pfp}]]]))
+     (when (and (seq (:image_url nft))
+                (not (str/ends-with? (:image_url nft) ".svg"))
+                (not (str/ends-with? (:image_url nft) ".mp4")))
+       [toastable-highlight-view
+        ;; the last string is an emoji. It might not show up in all editors but its there
+        {:toast-label (str (i18n/label :profile-picture-updated)) " " "😎"}
+        [quo/list-item {:title    (i18n/label :t/use-as-profile-picture)
+                        :theme    :accent
+                        :on-press #(re-frame/dispatch
+                                    [::multiaccounts/save-profile-picture-from-url (:image_url nft)])
+                        :icon     :main-icons/profile
+                        :accessibility-label
+                        :set-nft-as-pfp}]])]))
 
 (defn nft-assets [{:keys [num-assets address collectible-slug]}]
   (let [assets (<sub [:wallet/collectible-assets-by-collection-and-address address collectible-slug])]
@@ -154,12 +159,13 @@
             :text-size      :large
             :accessibility-label
             (keyword (str "collection-" index))
-            :icon
-            [wallet.components/token-icon {:style  {:border-radius 40
-                                                    :overflow      :hidden
-                                                    :border-width  1
-                                                    :border-color  colors/gray-lighter}
-                                           :source {:uri (:image_url collectible)}}]
+            :icon           (if (seq (:image_url collectible))
+                              [wallet.components/token-icon {:style  {:border-radius 40
+                                                                      :overflow      :hidden
+                                                                      :border-width  1
+                                                                      :border-color  colors/gray-lighter}
+                                                             :source {:uri (:image_url collectible)}}]
+                         :main-icons/photo)
             :accessory      :text
             :accessory-text (:owned_asset_count collectible)}]]
          :padding-vertical     0

@@ -6,8 +6,8 @@
 (defn radius [size] (/ size 2))
 
 (defn photo-container [size]
-  {:position      :relative
-   :border-radius (radius size)})
+  {:position         :relative
+   :border-radius    (radius size)})
 
 (defn photo-border
   ([size] (photo-border size :absolute))
