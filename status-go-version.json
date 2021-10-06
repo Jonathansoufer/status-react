@@ -3,7 +3,7 @@
     "_comment": "Instead use: scripts/update-status-go.sh <rev>",
     "owner": "status-im",
     "repo": "status-go",
-    "version": "v0.89.10",
-    "commit-sha1": "75aebd94aba4bdc45dcda96188aa9c8533facdca",
-    "src-sha256": "1p2vkj00j9m64cd1fhaa12657qxrz4ramshh1g4qm3c1yjkk3091"
+    "version": "feature/identify_new_chats",
+    "commit-sha1": "d872e8b492673aa388c951465e9f84002431d40b",
+    "src-sha256": "1f6f197lk13d3k5racrjmnpczwda1wlwxl9w32cnyynzwpq4l9l0"
 }
