@@ -198,6 +198,7 @@
 (reg-root-key-sub :intro-wizard-state :intro-wizard)
 
 (reg-root-key-sub :popover/popover :popover/popover)
+(reg-root-key-sub :visibility-status-popover/popover :visibility-status-popover/popover)
 (reg-root-key-sub :add-account :add-account)
 
 (reg-root-key-sub :keycard :keycard)

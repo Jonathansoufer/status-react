@@ -1667,5 +1667,10 @@
     "fee-cap": "Fee cap",
     "tip-cap": "Tip cap",
     "enable-opensea-nfts": "Enable loading NFTs from OpenSea ?",
-    "opensea-nfts-leak-metadata": "Loading NFTs from OpenSea shares metadata with third party services"
+    "opensea-nfts-leak-metadata": "Loading NFTs from OpenSea shares metadata with third party services",
+    "status-online": "Online",
+    "status-dnd": "Do not distrub",
+    "status-invisible": "Invisible",
+    "subtitle-dnd": "Mutes all notifications",
+    "subtitle-invisible": "Hides your online status"
 }
