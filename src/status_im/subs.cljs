@@ -1825,7 +1825,8 @@
  :<- [:wallet/collectible-collections]
  (fn [all-collections [_ address]]
    (when address
-     (get all-collections (string/lower-case address) []))))
+     (let [all-collections (get all-collections (string/lower-case address) [])]
+       (sort-by :name all-collections)))))
 
 (re-frame/reg-sub
  :wallet/collectible-assets-by-collection-and-address
