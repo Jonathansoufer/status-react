@@ -306,3 +306,7 @@ class HomeView(BaseView):
         self.clear_history_button.click()
         from views.chat_view import ChatView
         ChatView(self.driver).clear_button.click()
+
+    def pn_group_chat_invite_icon(self, pn_text):
+        self.driver.info("**Getting PN icon for group chat invite: %s**" % pn_text)
+        return SilentButton(self.driver, xpath="//*[@text='%s']/../../../*[@resource-id='android:id/right_icon_container']" % pn_text)

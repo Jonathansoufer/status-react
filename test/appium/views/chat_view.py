@@ -970,3 +970,12 @@ class ChatView(BaseView):
     @staticmethod
     def changed_group_name_system_message(admin, chat_name):
         return "%s changed the group's name to %s" % (admin, chat_name)
+
+    ### Push notifications
+    @staticmethod
+    def pn_invited_to_group_chat(admin, chat_name):
+        return '%s invited you to %s' % (admin, chat_name)
+
+    @staticmethod
+    def pn_wants_you_to_join_to_group_chat(admin, chat_name):
+        return '%s wants you to join group %s' % (admin, chat_name)

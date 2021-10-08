@@ -76,8 +76,6 @@ class TestCommunitiesMultipleDevices(MultipleDeviceTestCase):
 
     @marks.testrail_id(695845)
     @marks.medium
-    @marks.skip
-    # TODO: blocked due to 12649
     def test_notification_in_activity_center_for_mention_in_community_and_group_chat(self):
         self.create_drivers(2)
         home_1, home_2 = SignInView(self.drivers[0]).create_user(), SignInView(self.drivers[1]).create_user()
@@ -104,7 +102,8 @@ class TestCommunitiesMultipleDevices(MultipleDeviceTestCase):
         community_link_text = community_1.copy_community_link()
         pub_1 = home_1.create_group_chat(user_names_to_add=[username_2], group_chat_name=pub_chat_name)
 
-        pub_2 = home_2.get_chat_from_home_view(pub_chat_name).click()
+        pub_2_element = home_2.get_chat_from_home_view(pub_chat_name).wait_for_element(60)
+        pub_2 = pub_2_element.click()
         pub_2.join_chat_button.click()
         pub_1.chat_message_input.paste_text_from_clipboard()
         pub_1.send_message_button.click()
