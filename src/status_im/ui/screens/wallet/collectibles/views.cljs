@@ -143,32 +143,50 @@
                         :accessibility-label
                         :set-nft-as-pfp}]])]))
 
+(defn no-assets-error []
+  [react/view {:style {:flex            1
+                       :justify-content :center
+                       :padding         16
+                       :margin-vertical 16
+                       :align-items     :center
+                       :border-radius   16}}
+   [icons/icon :photo {:color colors/red}]
+   [quo/text {:color :secondary
+              :style {:magin-top 8}}
+    (i18n/label :t/no-collectibles)]])
+
 (defn nft-assets [{:keys [num-assets address collectible-slug]}]
-  (let [assets (<sub [:wallet/collectible-assets-by-collection-and-address address collectible-slug])]
+  (let [assets (<sub [:wallet/collectible-assets-by-collection-and-address address collectible-slug])
+        fetching? (<sub [:wallet/fetching-assets-by-collectible-slug collectible-slug])]
     [react/view {:flex            1
                  :flex-wrap       :wrap
                  :justify-content :space-between
                  :flex-direction  :row
                  :style           {:padding-horizontal 16}}
-     (if (seq assets)
-       (for [asset assets]
-         ^{:key (:id asset)}
-         [react/touchable-opacity
-          {:style               {:width         "48%"
-                                 :border-radius 16
-                                 :margin-bottom 16}
-           :on-press            #(re-frame/dispatch [::wallet/show-nft-details asset])
-           :accessibility-label :nft-asset}
-          (if (is-image? asset)
-            [react/image {:style  {:flex          1
-                                   :aspect-ratio  1
-                                   :border-width  1
-                                   :border-color  colors/gray-lighter
-                                   :border-radius 16}
-                          :source {:uri (:image_url asset)}}]
-            [missing-image-placeholder])])
+     (cond
+         fetching? [nft-assets-skeleton num-assets]
 
-       [nft-assets-skeleton num-assets])]))
+         (and (not fetching?)
+              (not (seq assets)))
+         [no-assets-error]
+
+         (seq assets)
+         (for [asset assets]
+           ^{:key (:id asset)}
+           [react/touchable-opacity
+            {:style               {:width         "48%"
+                                   :border-radius 16
+                                   :margin-bottom 16}
+             :on-press            #(re-frame/dispatch [::wallet/show-nft-details asset])
+             :accessibility-label :nft-asset}
+            (if (is-image? asset)
+              [react/image {:style  {:flex          1
+                                     :aspect-ratio  1
+                                     :border-width  1
+                                     :border-color  colors/gray-lighter
+                                     :border-radius 16}
+                            :source {:uri (:image_url asset)}}]
+              [missing-image-placeholder])]))]))
 
 (defn nft-collections [address]
   (let [collection (<sub [:wallet/collectible-collection address])]

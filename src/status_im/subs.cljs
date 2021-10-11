@@ -176,6 +176,7 @@
 (reg-root-key-sub :wallet/transactions-management-enabled? :wallet/transactions-management-enabled?)
 (reg-root-key-sub :wallet/all-tokens :wallet/all-tokens)
 (reg-root-key-sub :wallet/collectible-collections :wallet/collectible-collections)
+(reg-root-key-sub :wallet/fetching-collection-assets :wallet/fetching-collection-assets)
 (reg-root-key-sub :wallet/collectible-assets :wallet/collectible-assets)
 (reg-root-key-sub :wallet/selected-collectible :wallet/selected-collectible)
 
@@ -1834,6 +1835,12 @@
  (fn [all-assets [_ address collectible-slug]]
    (get-in all-assets [address collectible-slug] [])))
 
+(re-frame/reg-sub
+ :wallet/fetching-assets-by-collectible-slug
+ :<- [:wallet/fetching-collection-assets]
+ (fn [fetching-collection-assets [_ collectible-slug]]
+   (get fetching-collection-assets collectible-slug false)))
+
 ;;ACTIVITY CENTER NOTIFICATIONS ========================================================================================
 
 (defn- group-notifications-by-date
@@ -2860,3 +2867,14 @@
            (>= (count new-password) 6)
            (>= (count current-password) 6)
            (= new-password confirm-new-password))})))
+
+(comment
+  (-> re-frame.db/app-db
+      deref
+      :wallet/collectible-collections
+      (get "0x54becc7560a7be76d72ed76a1f5fee6c5a2a7ab6")
+      (as-> coll (map :owned_asset_count coll))
+      (as-> coll (reduce + 0 coll))
+      )
+
+  )

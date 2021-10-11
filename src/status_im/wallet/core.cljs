@@ -229,23 +229,33 @@
                               {:method     "wallet_getOpenseaCollectionsByOwner"
                                :params     [chain-id address]
                                :on-error   (fn [error]
-                                             (log/error "Unable to get Opensea collections" address error))
+                                             (log/error "Unable to get Opensea collections" address error)
+                              )
                                :on-success #(re-frame/dispatch [::collectibles-collection-fetch-success address %])})
                             addresses)})))
 
 (fx/defn collectible-assets-fetch-success
   {:events [::collectible-assets-fetch-success]}
   [{:keys [db]} address collectible-slug assets]
-  {:db (assoc-in db [:wallet/collectible-assets address collectible-slug] assets)})
+  {:db (-> db
+           (assoc-in [:wallet/fetching-collection-assets collectible-slug] false)
+           (assoc-in [:wallet/collectible-assets address collectible-slug] assets))})
+
+(fx/defn collectibles-assets-fetch-error
+  {:events [::collectibles-assets-fetch-error]}
+  [{:keys [db]} collectible-slug]
+  {:db (assoc-in db [:wallet/fetching-collection-assets collectible-slug] false)})
 
 (fx/defn fetch-collectible-assets-by-owner-and-collection
   {:events [::fetch-collectible-assets-by-owner-and-collection]}
   [{:keys [db]} address collectible-slug limit]
   (let [chain-id (ethereum/network->chain-id (ethereum/current-network db))]
-    {::json-rpc/call [{:method     "wallet_getOpenseaAssetsByOwnerAndCollection"
+    {:db (assoc-in db [:wallet/fetching-collection-assets collectible-slug] true)
+     ::json-rpc/call [{:method     "wallet_getOpenseaAssetsByOwnerAndCollection"
                        :params     [chain-id address collectible-slug limit]
                        :on-error   (fn [error]
-                                     (log/error "Unable to get collectible assets" address error))
+                                     (log/error "Unable to get collectible assets" address error)
+                                     (re-frame/dispatch [::collectibles-assets-fetch-error collectible-slug]))
                        :on-success #(re-frame/dispatch [::collectible-assets-fetch-success address collectible-slug %])}]}))
 
 (fx/defn show-nft-details
