@@ -17,9 +17,9 @@
             [status-im.ui.components.accordion :as accordion]))
 
 (defn is-image? [nft]
- (and (seq (:image_url nft))
-      (not (str/ends-with? (:image_url nft) ".svg"))
-      (not (str/ends-with? (:image_url nft) ".mp4"))))
+  (and (seq (:image_url nft))
+       (not (str/ends-with? (:image_url nft) ".svg"))
+       (not (str/ends-with? (:image_url nft) ".mp4"))))
 
 (defn missing-image-placeholder []
   [react/view {:style {:width            "100%"
@@ -156,7 +156,7 @@
     (i18n/label :t/no-collectibles)]])
 
 (defn nft-assets [{:keys [num-assets address collectible-slug]}]
-  (let [assets (<sub [:wallet/collectible-assets-by-collection-and-address address collectible-slug])
+  (let [assets    (<sub [:wallet/collectible-assets-by-collection-and-address address collectible-slug])
         fetching? (<sub [:wallet/fetching-assets-by-collectible-slug collectible-slug])]
     [react/view {:flex            1
                  :flex-wrap       :wrap
@@ -164,29 +164,33 @@
                  :flex-direction  :row
                  :style           {:padding-horizontal 16}}
      (cond
-         fetching? [nft-assets-skeleton num-assets]
+       fetching? [nft-assets-skeleton num-assets]
 
-         (and (not fetching?)
-              (not (seq assets)))
-         [no-assets-error]
+       ;; <shivekkhurana> OpenSea sometimes doesn't return an asset
+       ;; This condition handles it
+       (and (not fetching?)
+            (not (seq assets)))
+       [no-assets-error]
 
-         (seq assets)
-         (for [asset assets]
-           ^{:key (:id asset)}
-           [react/touchable-opacity
-            {:style               {:width         "48%"
-                                   :border-radius 16
-                                   :margin-bottom 16}
-             :on-press            #(re-frame/dispatch [::wallet/show-nft-details asset])
-             :accessibility-label :nft-asset}
-            (if (is-image? asset)
-              [react/image {:style  {:flex          1
-                                     :aspect-ratio  1
-                                     :border-width  1
-                                     :border-color  colors/gray-lighter
-                                     :border-radius 16}
-                            :source {:uri (:image_url asset)}}]
-              [missing-image-placeholder])]))]))
+       (seq assets)
+       (for [asset assets]
+         ^{:key (:id asset)}
+         [react/touchable-opacity
+          {:style
+           {:width         "48%"
+            :border-radius 16
+            :margin-bottom 16}
+           :on-press #(re-frame/dispatch [::wallet/show-nft-details asset])
+           :accessibility-label
+           :nft-asset}
+          (if (is-image? asset)
+            [react/image {:style  {:flex          1
+                                   :aspect-ratio  1
+                                   :border-width  1
+                                   :border-color  colors/gray-lighter
+                                   :border-radius 16}
+                          :source {:uri (:image_url asset)}}]
+            [missing-image-placeholder])]))]))
 
 (defn nft-collections [address]
   (let [collection (<sub [:wallet/collectible-collection address])]
@@ -202,12 +206,13 @@
             :accessibility-label
             (keyword (str "collection-" index))
             :icon           (if (seq (:image_url collectible))
-                              [wallet.components/token-icon {:style  {:border-radius 40
-                                                                      :overflow      :hidden
-                                                                      :border-width  1
-                                                                      :border-color  colors/gray-lighter}
-                                                             :source {:uri (:image_url collectible)}}]
-                         :main-icons/photo)
+                              [wallet.components/token-icon
+                               {:style  {:border-radius 40
+                                         :overflow      :hidden
+                                         :border-width  1
+                                         :border-color  colors/gray-lighter}
+                                :source {:uri (:image_url collectible)}}]
+                              :main-icons/photo)
             :accessory      :text
             :accessory-text (:owned_asset_count collectible)}]]
          :padding-vertical     0

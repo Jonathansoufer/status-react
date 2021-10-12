@@ -205,7 +205,7 @@
     (fx/merge cofx
               {::json-rpc/call [{:method     "multiaccounts_storeIdentityImageFromURL"
                                  :params     [key-uid url]
-                                 :on-error   (partial prn :----->)
+                                 :on-error   log/warn
                                  :on-success #(re-frame/dispatch [::update-local-picture %])}]}
               (bottom-sheet/hide-bottom-sheet))))
 

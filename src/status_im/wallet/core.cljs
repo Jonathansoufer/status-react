@@ -229,8 +229,7 @@
                               {:method     "wallet_getOpenseaCollectionsByOwner"
                                :params     [chain-id address]
                                :on-error   (fn [error]
-                                             (log/error "Unable to get Opensea collections" address error)
-                              )
+                                             (log/error "Unable to get Opensea collections" address error))
                                :on-success #(re-frame/dispatch [::collectibles-collection-fetch-success address %])})
                             addresses)})))
 

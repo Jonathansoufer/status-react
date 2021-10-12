@@ -2867,14 +2867,3 @@
            (>= (count new-password) 6)
            (>= (count current-password) 6)
            (= new-password confirm-new-password))})))
-
-(comment
-  (-> re-frame.db/app-db
-      deref
-      :wallet/collectible-collections
-      (get "0x54becc7560a7be76d72ed76a1f5fee6c5a2a7ab6")
-      (as-> coll (map :owned_asset_count coll))
-      (as-> coll (reduce + 0 coll))
-      )
-
-  )
